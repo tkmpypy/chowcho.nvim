@@ -7,7 +7,7 @@ local _wins = {}
 local _opt = {
   text_color = '#FFFFFF',
   bg_color = '#555555',
-  active_border_color = '#D2D',
+  active_border_color = '#B400C8',
   exclude_filetypes = {'LuaTree', 'packer'},
   border_style = 'default'
 }
@@ -78,11 +78,13 @@ local create_floating_win = function(x, y, win, label)
     focusable = false
   }
 
-  local window = vim.api.nvim_open_win(buf, false, opt)
+  local float_win = vim.api.nvim_open_win(buf, false, opt)
 
-  vim.api.nvim_win_set_option(window, 'winhl', 'Normal:ChowchoFloat')
-  table.insert(_float_wins, window)
-  table.insert(_wins, {no = win_num, win = win})
+  vim.api.nvim_win_set_option(float_win, 'winhl', 'Normal:ChowchoFloat')
+  table.insert(_float_wins, float_win)
+  table.insert(_wins, {no = win_num, win = win, float = float_win})
+
+  return float_win
 
 end
 
@@ -93,18 +95,31 @@ local calc_center_win_pos = function(win)
   return {w = math.ceil(w / 2), h = math.ceil(h / 2)}
 end
 
+local hi_active_float = function(f_win)
+  for _, v in pairs(_border_style[_opt.border_style]) do
+    vim.fn.matchadd("ChowchoActiveFloat", v, 0, -1, {window=f_win})
+  end
+end
+
 chowcho.run = function()
   _wins = {}
   local wins = vim.api.nvim_list_wins()
-
+  local current_win = vim.api.nvim_get_current_win()
   vim.cmd('hi! ChowchoFloat guifg=' .. _opt.text_color .. ' guibg=' ..
               _opt.bg_color)
+  vim.cmd('hi! ChowchoActiveFloat guifg=' .. _opt.active_border_color .. ' guibg=' ..
+              _opt.bg_color)
+
   for i, v in ipairs(wins) do
     local pos = calc_center_win_pos(v)
     local buf = vim.api.nvim_win_get_buf(v)
     local fname = vim.fn.expand('#' .. buf .. ':t')
     if (fname == '') then fname = 'NO NAME' end
-    create_floating_win(pos.w, pos.h, v, {str(i), fname})
+    local f_win = create_floating_win(pos.w, pos.h, v, {str(i), fname})
+   
+    if (v == current_win) then
+      hi_active_float(f_win)
+    end
   end
 
   local timer = vim.loop.new_timer()
@@ -138,11 +153,11 @@ end
 
 --[[
 {
-  text_color = '#FFFFFF'
-  bg_color = '#555555'
-  active_border_color = '#D2D'
+  text_color = '#FFFFFF',
+  bg_color = '#555555',
+  active_border_color = '#B400C8',
   exclude_filetypes = {'LuaTree', 'packer'},
-  border_style = 'fancy' -- 'default', 'fancy'
+  border_style = 'fancy' -- 'default', 'fancy',
 }
 --]]
 chowcho.setup = function(opt)
