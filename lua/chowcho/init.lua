@@ -6,9 +6,9 @@ local _wins = {}
 -- for default options
 local _opt = {
   text_color = '#FFFFFF',
-  bg_color = '#555555',
+  bg_color = nil,
   active_border_color = '#B400C8',
-  exclude_filetypes = {'LuaTree', 'packer'},
+  exclude_filetypes = {'LuaTree', 'packer'}, -- TODO(tkmpypy): unimplemented
   border_style = 'default'
 }
 
@@ -101,14 +101,25 @@ local hi_active_float = function(f_win)
   end
 end
 
+local set_highlight = function()
+  if (_opt.bg_color == nil or _opt.bg_color == '') then
+    vim.cmd('hi! ChowchoFloat guifg=' .. _opt.text_color)
+    vim.cmd('hi! ChowchoActiveFloat guifg=' .. _opt.active_border_color)
+  else
+    vim.cmd('hi! ChowchoFloat guifg=' .. _opt.text_color .. ' guibg=' ..
+                _opt.bg_color)
+    vim.cmd('hi! ChowchoActiveFloat guifg=' .. _opt.active_border_color .. ' guibg=' ..
+                _opt.bg_color)
+  end
+
+end
+
 chowcho.run = function()
   _wins = {}
   local wins = vim.api.nvim_list_wins()
   local current_win = vim.api.nvim_get_current_win()
-  vim.cmd('hi! ChowchoFloat guifg=' .. _opt.text_color .. ' guibg=' ..
-              _opt.bg_color)
-  vim.cmd('hi! ChowchoActiveFloat guifg=' .. _opt.active_border_color .. ' guibg=' ..
-              _opt.bg_color)
+  
+  set_highlight()
 
   for i, v in ipairs(wins) do
     local pos = calc_center_win_pos(v)
