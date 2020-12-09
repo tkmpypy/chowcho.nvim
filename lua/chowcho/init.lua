@@ -8,7 +8,6 @@ local _opt = {
   text_color = '#FFFFFF',
   bg_color = nil,
   active_border_color = '#B400C8',
-  exclude_filetypes = {'LuaTree', 'packer'}, -- TODO(tkmpypy): unimplemented
   border_style = 'default'
 }
 
@@ -23,7 +22,16 @@ local _border_style = {
     botright = '╝',
     bot = '═'
   },
-  fancy = {} -- TODO(tkmpypy): unimplemented
+  rounded = {
+    topleft = '╭',
+    topright = '╮',
+    top = '─',
+    left = '│',
+    right = '│',
+    botleft = '╰',
+    botright = '╯',
+    bot = '─'
+  }
 }
 
 local str = function(v) return v .. '' end
@@ -97,7 +105,7 @@ end
 
 local hi_active_float = function(f_win)
   for _, v in pairs(_border_style[_opt.border_style]) do
-    vim.fn.matchadd("ChowchoActiveFloat", v, 0, -1, {window=f_win})
+    vim.fn.matchadd("ChowchoActiveFloat", v, 0, -1, {window = f_win})
   end
 end
 
@@ -108,8 +116,8 @@ local set_highlight = function()
   else
     vim.cmd('hi! ChowchoFloat guifg=' .. _opt.text_color .. ' guibg=' ..
                 _opt.bg_color)
-    vim.cmd('hi! ChowchoActiveFloat guifg=' .. _opt.active_border_color .. ' guibg=' ..
-                _opt.bg_color)
+    vim.cmd('hi! ChowchoActiveFloat guifg=' .. _opt.active_border_color ..
+                ' guibg=' .. _opt.bg_color)
   end
 
 end
@@ -118,7 +126,7 @@ chowcho.run = function()
   _wins = {}
   local wins = vim.api.nvim_list_wins()
   local current_win = vim.api.nvim_get_current_win()
-  
+
   set_highlight()
 
   for i, v in ipairs(wins) do
@@ -127,10 +135,8 @@ chowcho.run = function()
     local fname = vim.fn.expand('#' .. buf .. ':t')
     if (fname == '') then fname = 'NO NAME' end
     local f_win = create_floating_win(pos.w, pos.h, v, {str(i), fname})
-   
-    if (v == current_win) then
-      hi_active_float(f_win)
-    end
+
+    if (v == current_win) then hi_active_float(f_win) end
   end
 
   local timer = vim.loop.new_timer()
@@ -167,8 +173,7 @@ end
   text_color = '#FFFFFF',
   bg_color = '#555555',
   active_border_color = '#B400C8',
-  exclude_filetypes = {'LuaTree', 'packer'},
-  border_style = 'fancy' -- 'default', 'fancy',
+  border_style = 'rounded' -- 'default', 'rounded',
 }
 --]]
 chowcho.setup = function(opt)
@@ -177,9 +182,6 @@ chowcho.setup = function(opt)
     if (opt.bg_color) then _opt.bg_color = opt.bg_color end
     if (opt.active_border_color) then
       _opt.active_border_color = opt.active_border_color
-    end
-    if (opt.exclude_filetypes) then
-      _opt.exclude_filetypes = opt.exclude_filetypes
     end
     if (opt.border_style) then _opt.border_style = opt.border_style end
   else
