@@ -132,11 +132,14 @@ chowcho.run = function()
   for i, v in ipairs(wins) do
     local pos = calc_center_win_pos(v)
     local buf = vim.api.nvim_win_get_buf(v)
-    local fname = vim.fn.expand('#' .. buf .. ':t')
-    if (fname == '') then fname = 'NO NAME' end
-    local f_win = create_floating_win(pos.w, pos.h, v, {str(i), fname})
+    local bt = vim.api.nvim_buf_get_option(buf, 'buftype')
+    if bt ~= 'prompt' then
+      local fname = vim.fn.expand('#' .. buf .. ':t')
+      if (fname == '') then fname = 'NO NAME' end
+      local f_win = create_floating_win(pos.w, pos.h, v, {str(i), fname})
 
-    if (v == current_win) then hi_active_float(f_win) end
+      if (v == current_win) then hi_active_float(f_win) end
+    end
   end
 
   local timer = vim.loop.new_timer()
