@@ -40,7 +40,7 @@ local create_content = function(label)
   local no = label[1]
   local fname = label[2]
   local content = '[' .. no .. ']' .. ' ' .. fname
-  local width = #content + 2
+  local width = vim.fn.strwidth(content) + 2
   local border = _border_style[_opt.border_style]
 
   -- top and bottom
