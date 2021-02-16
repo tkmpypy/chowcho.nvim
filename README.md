@@ -33,3 +33,6 @@ require('chowcho').setup {
 ```
 
 ## Screenshot
+
+![image](https://user-images.githubusercontent.com/17525828/101620670-2c517100-3a58-11eb-91c8-575fdde092f1.png)
+![image](https://user-images.githubusercontent.com/17525828/101620683-31162500-3a58-11eb-91a2-e7fc36e708a7.png)
