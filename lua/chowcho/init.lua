@@ -91,10 +91,10 @@ chowcho.run = function()
       local fname = vim.fn.expand('#' .. buf .. ':t')
       if (fname == '') then fname = 'NO NAME' end
       if is_enable_icon() then
-        local icon = ui.get_icon(fname)
+        local icon, hl_name = ui.get_icon(fname)
         fname = icon .. ' ' ..fname
       end
-      local f_win, win = ui.create_floating_win(pos.w, pos.h, v,
+      local bufnr, f_win, win = ui.create_floating_win(pos.w, pos.h, v,
                                                 {str(i), fname},
                                                 _border_style[_opt.border_style])
       table.insert(_float_wins, f_win)

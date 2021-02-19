@@ -55,7 +55,7 @@ ui.create_floating_win = function(x, y, win, label, border_style)
 
   vim.api.nvim_win_set_option(float_win, 'winhl', 'Normal:ChowchoFloat')
 
-  return float_win, {no = win_num, win = win, float = float_win}
+  return buf, float_win, {no = win_num, win = win, float = float_win}
 end
 
 ui.get_icon = function(fname)
