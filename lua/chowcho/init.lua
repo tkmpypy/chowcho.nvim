@@ -90,13 +90,22 @@ chowcho.run = function()
     if bt ~= 'prompt' then
       local fname = vim.fn.expand('#' .. buf .. ':t')
       if (fname == '') then fname = 'NO NAME' end
+
+      local icon, hl_name = '', ''
       if is_enable_icon() then
-        local icon, hl_name = ui.get_icon(fname)
-        fname = icon .. ' ' ..fname
+        icon, hl_name = ui.get_icon(fname)
+        fname = icon .. ' ' .. fname
       end
       local bufnr, f_win, win = ui.create_floating_win(pos.w, pos.h, v,
-                                                {str(i), fname},
-                                                _border_style[_opt.border_style])
+                                                       {str(i), fname},
+                                                       _border_style[_opt.border_style])
+
+      if is_enable_icon() then
+        local line = vim.api.nvim_buf_get_lines(bufnr, 1, 2, false)
+        local icon_col = line[1]:find(icon)
+        local end_col = icon_col + vim.fn.strlen(icon)
+        vim.api.nvim_buf_add_highlight(bufnr, -1, hl_name, 1, icon_col, end_col)
+      end
       table.insert(_float_wins, f_win)
       table.insert(_wins, win)
 
