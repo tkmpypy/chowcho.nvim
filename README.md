@@ -25,6 +25,7 @@ call `setup` function
 
 ```lua
 require('chowcho').setup {
+  icon_enabled = true, -- required 'nvim-web-devicons' (default: false)
   text_color = '#FFFFFF',
   bg_color = '#555555',
   active_border_color = '#0A8BFF',

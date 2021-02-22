@@ -1,3 +1,5 @@
+local ui = require('chowcho.ui')
+
 local chowcho = {}
 
 local _float_wins = {}
@@ -5,6 +7,7 @@ local _wins = {}
 
 -- for default options
 local _opt = {
+  icon_enabled = false,
   text_color = '#FFFFFF',
   bg_color = nil,
   active_border_color = '#B400C8',
@@ -36,64 +39,15 @@ local _border_style = {
 
 local str = function(v) return v .. '' end
 
-local create_content = function(label)
-  local no = label[1]
-  local fname = label[2]
-  local content = '[' .. no .. ']' .. ' ' .. fname
-  local width = vim.fn.strwidth(content) + 2
-  local border = _border_style[_opt.border_style]
+local is_enable_icon = function()
+  if _opt.icon_enabled then
+    local loaded_devicons = vim.api.nvim_get_var('loaded_devicons')
+    if loaded_devicons < 1 then return false end
 
-  -- top and bottom
-  local top = ''
-  local bottom = ''
-  for i = 1, width do
-    if (i == 1) then
-      top = border.topleft .. top
-      bottom = border.botleft .. bottom
-      content = border.left .. content
-    elseif (i == width) then
-      top = top .. border.topright
-      bottom = bottom .. border.botright
-      content = content .. border.right
-    else
-      top = top .. border.top
-      bottom = bottom .. border.bot
-    end
+    return require('nvim-web-devicons').has_loaded()
   end
 
-  return {top, content, bottom}
-end
-
-local create_floating_win = function(x, y, win, label)
-  local buf = vim.api.nvim_create_buf(false, true)
-
-  local win_num = label[1]
-  local content_tbl = create_content(label)
-  vim.api.nvim_buf_set_lines(buf, 0, -1, true, content_tbl)
-
-  local _x = x - (math.ceil(#content_tbl[2] / 2)) + 2
-
-  local _content_w = vim.api.nvim_strwidth(content_tbl[2])
-  local opt = {
-    win = win,
-    relative = 'win',
-    width = _content_w,
-    height = 3,
-    col = _x,
-    row = y,
-    anchor = 'NW',
-    style = 'minimal',
-    focusable = false
-  }
-
-  local float_win = vim.api.nvim_open_win(buf, false, opt)
-
-  vim.api.nvim_win_set_option(float_win, 'winhl', 'Normal:ChowchoFloat')
-  table.insert(_float_wins, float_win)
-  table.insert(_wins, {no = win_num, win = win, float = float_win})
-
-  return float_win
-
+  return false
 end
 
 local calc_center_win_pos = function(win)
@@ -136,7 +90,24 @@ chowcho.run = function()
     if bt ~= 'prompt' then
       local fname = vim.fn.expand('#' .. buf .. ':t')
       if (fname == '') then fname = 'NO NAME' end
-      local f_win = create_floating_win(pos.w, pos.h, v, {str(i), fname})
+
+      local icon, hl_name = '', ''
+      if is_enable_icon() then
+        icon, hl_name = ui.get_icon(fname)
+        fname = icon .. ' ' .. fname
+      end
+      local bufnr, f_win, win = ui.create_floating_win(pos.w, pos.h, v,
+                                                       {str(i), fname},
+                                                       _border_style[_opt.border_style])
+
+      if is_enable_icon() then
+        local line = vim.api.nvim_buf_get_lines(bufnr, 1, 2, false)
+        local icon_col = line[1]:find(icon)
+        local end_col = icon_col + vim.fn.strlen(icon)
+        vim.api.nvim_buf_add_highlight(bufnr, -1, hl_name, 1, icon_col, end_col)
+      end
+      table.insert(_float_wins, f_win)
+      table.insert(_wins, win)
 
       if (v == current_win) then hi_active_float(f_win) end
     end
@@ -173,6 +144,7 @@ end
 
 --[[
 {
+  icon_enabled = true,
   text_color = '#FFFFFF',
   bg_color = '#555555',
   active_border_color = '#B400C8',
@@ -181,12 +153,13 @@ end
 --]]
 chowcho.setup = function(opt)
   if (type(opt) == 'table') then
-    if (opt.text_color) then _opt.text_color = opt.text_color end
-    if (opt.bg_color) then _opt.bg_color = opt.bg_color end
-    if (opt.active_border_color) then
+    if opt.icon_enabled ~= nil then _opt.icon_enabled = opt.icon_enabled end
+    if opt.text_color ~= nil then _opt.text_color = opt.text_color end
+    if opt.bg_color ~= nil then _opt.bg_color = opt.bg_color end
+    if opt.active_border_color ~= nil then
       _opt.active_border_color = opt.active_border_color
     end
-    if (opt.border_style) then _opt.border_style = opt.border_style end
+    if opt.border_style ~= nil then _opt.border_style = opt.border_style end
   else
     error('[chowcho.nvim] option is must be table')
   end
