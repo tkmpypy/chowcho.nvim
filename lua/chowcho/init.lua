@@ -89,7 +89,7 @@ chowcho.run = function()
     local bt = vim.api.nvim_buf_get_option(buf, 'buftype')
     if bt ~= 'prompt' then
       local fname = vim.fn.expand('#' .. buf .. ':t')
-      if (fname == '') then fname = 'NO NAME' end
+      if (fname == '') then goto continue end
 
       local icon, hl_name = '', ''
       if is_enable_icon() then
@@ -111,6 +111,7 @@ chowcho.run = function()
 
       if (v == current_win) then hi_active_float(f_win) end
     end
+    ::continue::
   end
 
   local timer = vim.loop.new_timer()
