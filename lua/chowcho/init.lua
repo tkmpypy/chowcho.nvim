@@ -73,7 +73,15 @@ local set_highlight = function()
     vim.cmd('hi! ChowchoActiveFloat guifg=' .. _opt.active_border_color ..
                 ' guibg=' .. _opt.bg_color)
   end
+end
 
+local win_close = function()
+  for i, v in ipairs(_float_wins) do
+    if (v ~= nil) then
+      vim.api.nvim_win_close(v, true)
+      _float_wins[i] = nil
+    end
+  end
 end
 
 chowcho.run = function()
@@ -128,19 +136,10 @@ chowcho.run = function()
         end
       end
     end
-    chowcho.on_cursor_moved()
+    win_close()
     timer:close()
   end))
 
-end
-
-chowcho.on_cursor_moved = function()
-  for i, v in ipairs(_float_wins) do
-    if (v ~= nil) then
-      vim.api.nvim_win_close(v, true)
-      _float_wins[i] = nil
-    end
-  end
 end
 
 --[[
