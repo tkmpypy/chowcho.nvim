@@ -1,6 +1,6 @@
 # chowcho.nvim
 
-- simply window selector for neovim written in lua
+- simply window operation for neovim written in lua
 - inspired by [you-are-here.vim](https://github.com/bignimbus/you-are-here.vim)
 
 ## Installation
@@ -17,6 +17,13 @@ Select the number after executing the command `Chowcho` or after calling the lua
 
 ```lua
 require('chowcho').run()
+```
+
+Optionally, run an arbitrary function which receives winid.
+The example below hides a selected window.
+
+```lua
+requre('chowcho').run(vim.api.nvim_win_hide)
 ```
 
 ## Config

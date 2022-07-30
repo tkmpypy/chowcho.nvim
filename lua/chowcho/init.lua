@@ -84,7 +84,7 @@ local win_close = function()
   end
 end
 
-chowcho.run = function()
+chowcho.run = function(fn)
   _wins = {}
   local wins = vim.api.nvim_list_wins()
   local current_win = vim.api.nvim_get_current_win()
@@ -130,7 +130,7 @@ chowcho.run = function()
       for _, v in ipairs(_wins) do
         if (v ~= nil) then
           if (v.no == str(val)) then
-            vim.api.nvim_set_current_win(v.win)
+            (fn or vim.api.nvim_set_current_win)(v.win)
             break
           end
         end
