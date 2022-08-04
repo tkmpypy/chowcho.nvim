@@ -11,7 +11,8 @@ local _opt = {
   text_color = '#FFFFFF',
   bg_color = nil,
   active_border_color = '#B400C8',
-  border_style = 'default'
+  border_style = 'default',
+  exclude = function(buf, bt, fname) return fname == '' end
 }
 
 local _border_style = {
@@ -101,7 +102,7 @@ chowcho.run = function(fn, opt)
     local bt = vim.api.nvim_buf_get_option(buf, 'buftype')
     if bt ~= 'prompt' then
       local fname = vim.fn.expand('#' .. buf .. ':t')
-      if (fname == '') then goto continue end
+      if (opt_local.exclude(buf, bt, fname)) then goto continue end
 
       local icon, hl_name = '', ''
       if is_enable_icon(opt_local) then
@@ -153,6 +154,7 @@ end
   bg_color = '#555555',
   active_border_color = '#B400C8',
   border_style = 'rounded' -- 'default', 'rounded',
+  ignore_empty_fname = true,
 }
 --]]
 chowcho.setup = function(opt)
@@ -164,6 +166,7 @@ chowcho.setup = function(opt)
       _opt.active_border_color = opt.active_border_color
     end
     if opt.border_style ~= nil then _opt.border_style = opt.border_style end
+    if opt.ignore_empty_fname ~= nil then _opt.ignore_empty_fname = opt.ignore_empty_fname end
   else
     error('[chowcho.nvim] option is must be table')
   end
