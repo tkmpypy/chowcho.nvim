@@ -23,7 +23,7 @@ Optionally, run an arbitrary function which receives winid.
 The example below hides a selected window.
 
 ```lua
-requre('chowcho').run(vim.api.nvim_win_hide)
+require('chowcho').run(vim.api.nvim_win_hide)
 ```
 
 ## Config
@@ -37,6 +37,10 @@ require('chowcho').setup {
   bg_color = '#555555',
   active_border_color = '#0A8BFF',
   border_style = 'default' -- 'default', 'rounded',
+  exclude = function(buf, buftype, fname)
+    -- exclude a window from the choice based on its buffer information
+    return fname == ''
+  end
 }
 ```
 

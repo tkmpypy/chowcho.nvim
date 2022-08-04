@@ -11,7 +11,8 @@ local _opt = {
   text_color = '#FFFFFF',
   bg_color = nil,
   active_border_color = '#B400C8',
-  border_style = 'default'
+  border_style = 'default',
+  exclude = function(buf, bt, fname) return fname == '' end
 }
 
 local _border_style = {
@@ -39,8 +40,8 @@ local _border_style = {
 
 local str = function(v) return v .. '' end
 
-local is_enable_icon = function()
-  if _opt.icon_enabled then
+local is_enable_icon = function(opt)
+  if opt.icon_enabled then
     local loaded_devicons = vim.api.nvim_get_var('loaded_devicons')
     if loaded_devicons < 1 then return false end
 
@@ -57,21 +58,21 @@ local calc_center_win_pos = function(win)
   return {w = math.ceil(w / 2), h = math.ceil(h / 2)}
 end
 
-local hi_active_float = function(f_win)
-  for _, v in pairs(_border_style[_opt.border_style]) do
+local hi_active_float = function(f_win, opt)
+  for _, v in pairs(_border_style[opt.border_style]) do
     vim.fn.matchadd("ChowchoActiveFloat", v, 0, -1, {window = f_win})
   end
 end
 
-local set_highlight = function()
-  if (_opt.bg_color == nil or _opt.bg_color == '') then
-    vim.cmd('hi! ChowchoFloat guifg=' .. _opt.text_color)
-    vim.cmd('hi! ChowchoActiveFloat guifg=' .. _opt.active_border_color)
+local set_highlight = function(opt)
+  if (opt.bg_color == nil or opt.bg_color == '') then
+    vim.cmd('hi! ChowchoFloat guifg=' .. opt.text_color)
+    vim.cmd('hi! ChowchoActiveFloat guifg=' .. opt.active_border_color)
   else
-    vim.cmd('hi! ChowchoFloat guifg=' .. _opt.text_color .. ' guibg=' ..
-                _opt.bg_color)
-    vim.cmd('hi! ChowchoActiveFloat guifg=' .. _opt.active_border_color ..
-                ' guibg=' .. _opt.bg_color)
+    vim.cmd('hi! ChowchoFloat guifg=' .. opt.text_color .. ' guibg=' ..
+                opt.bg_color)
+    vim.cmd('hi! ChowchoActiveFloat guifg=' .. opt.active_border_color ..
+                ' guibg=' .. opt.bg_color)
   end
 end
 
@@ -84,12 +85,16 @@ local win_close = function()
   end
 end
 
-chowcho.run = function(fn)
-  _wins = {}
+chowcho.run = function(fn, opt)
+  local opt_local = {}
+  opt = opt or _opt
+  for k, v in pairs(_opt) do
+    opt_local[k] = opt[k] ~= nil and opt[k] or v
+  end
   local wins = vim.api.nvim_list_wins()
   local current_win = vim.api.nvim_get_current_win()
 
-  set_highlight()
+  set_highlight(opt_local)
 
   for i, v in ipairs(wins) do
     local pos = calc_center_win_pos(v)
@@ -97,18 +102,18 @@ chowcho.run = function(fn)
     local bt = vim.api.nvim_buf_get_option(buf, 'buftype')
     if bt ~= 'prompt' then
       local fname = vim.fn.expand('#' .. buf .. ':t')
-      if (fname == '') then goto continue end
+      if (opt_local.exclude(buf, bt, fname)) then goto continue end
 
       local icon, hl_name = '', ''
-      if is_enable_icon() then
+      if is_enable_icon(opt_local) then
         icon, hl_name = ui.get_icon(fname)
         fname = icon .. ' ' .. fname
       end
       local bufnr, f_win, win = ui.create_floating_win(pos.w, pos.h, v,
                                                        {str(i), fname},
-                                                       _border_style[_opt.border_style])
+                                                       _border_style[opt_local.border_style])
 
-      if is_enable_icon() then
+      if is_enable_icon(opt_local) then
         local line = vim.api.nvim_buf_get_lines(bufnr, 1, 2, false)
         local icon_col = line[1]:find(icon)
         local end_col = icon_col + vim.fn.strlen(icon)
@@ -117,7 +122,7 @@ chowcho.run = function(fn)
       table.insert(_float_wins, f_win)
       table.insert(_wins, win)
 
-      if (v == current_win) then hi_active_float(f_win) end
+      if (v == current_win) then hi_active_float(f_win, opt_local) end
     end
     ::continue::
   end
@@ -149,6 +154,7 @@ end
   bg_color = '#555555',
   active_border_color = '#B400C8',
   border_style = 'rounded' -- 'default', 'rounded',
+  ignore_empty_fname = true,
 }
 --]]
 chowcho.setup = function(opt)
@@ -160,6 +166,7 @@ chowcho.setup = function(opt)
       _opt.active_border_color = opt.active_border_color
     end
     if opt.border_style ~= nil then _opt.border_style = opt.border_style end
+    if opt.ignore_empty_fname ~= nil then _opt.ignore_empty_fname = opt.ignore_empty_fname end
   else
     error('[chowcho.nvim] option is must be table')
   end
