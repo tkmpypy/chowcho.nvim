@@ -23,7 +23,7 @@ Optionally, run an arbitrary function which receives winid.
 The example below hides a selected window.
 
 ```lua
-requre('chowcho').run(vim.api.nvim_win_hide)
+require('chowcho').run(vim.api.nvim_win_hide)
 ```
 
 ## Config
