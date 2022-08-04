@@ -37,6 +37,10 @@ require('chowcho').setup {
   bg_color = '#555555',
   active_border_color = '#0A8BFF',
   border_style = 'default' -- 'default', 'rounded',
+  exclude = function(buf, buftype, fname)
+    -- exclude a window from the choice based on its buffer information
+    return fname == ''
+  end
 }
 ```
 
