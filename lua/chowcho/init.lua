@@ -3,7 +3,6 @@ local ui = require('chowcho.ui')
 local chowcho = {}
 
 local _float_wins = {}
-local _wins = {}
 
 -- for default options
 local _opt = {
@@ -96,6 +95,7 @@ chowcho.run = function(fn, opt)
 
   set_highlight(opt_local)
 
+  local _wins = {}
   for i, v in ipairs(wins) do
     local pos = calc_center_win_pos(v)
     local buf = vim.api.nvim_win_get_buf(v)
