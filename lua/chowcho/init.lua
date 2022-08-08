@@ -129,14 +129,16 @@ chowcho.run = function(fn, opt)
 
   local timer = vim.loop.new_timer()
   timer:start(10, 0, vim.schedule_wrap(function()
-    local val = vim.fn.getchar()
-    val = vim.fn.nr2char(val)
-    if (val ~= nil) then
-      for _, v in ipairs(_wins) do
-        if (v ~= nil) then
-          if (v.no == str(val)) then
-            (fn or vim.api.nvim_set_current_win)(v.win)
-            break
+    local success, val = pcall(vim.fn.getchar)
+    if success then
+      val = vim.fn.nr2char(val)
+      if (val ~= nil) then
+        for _, v in ipairs(_wins) do
+          if (v ~= nil) then
+            if (v.no == str(val)) then
+              (fn or vim.api.nvim_set_current_win)(v.win)
+              break
+            end
           end
         end
       end
