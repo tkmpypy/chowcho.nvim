@@ -90,7 +90,7 @@ chowcho.run = function(fn, opt)
   for k, v in pairs(_opt) do
     opt_local[k] = opt[k] ~= nil and opt[k] or v
   end
-  local wins = vim.api.nvim_list_wins()
+  local wins = vim.api.nvim_tabpage_list_wins(0)
   local current_win = vim.api.nvim_get_current_win()
 
   set_highlight(opt_local)
