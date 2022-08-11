@@ -11,7 +11,8 @@ local _opt = {
   bg_color = nil,
   active_border_color = '#B400C8',
   border_style = 'default',
-  exclude = function(buf, bt, fname) return fname == '' end
+  use_exclude_default = true,
+  exclude = nil,
 }
 
 local _border_style = {
@@ -102,7 +103,11 @@ chowcho.run = function(fn, opt)
     local bt = vim.api.nvim_buf_get_option(buf, 'buftype')
     if bt ~= 'prompt' then
       local fname = vim.fn.expand('#' .. buf .. ':t')
-      if (opt_local.exclude(buf, bt, fname)) then goto continue end
+      if opt_local.use_exclude_default or opt_local.exclude == nil then
+        if fname == '' then goto continue end
+      else
+        if opt_local.exclude(buf, v) then goto continue end
+      end
 
       local icon, hl_name = '', ''
       if is_enable_icon(opt_local) then
@@ -156,7 +161,8 @@ end
   bg_color = '#555555',
   active_border_color = '#B400C8',
   border_style = 'rounded' -- 'default', 'rounded',
-  exclude = function(buf, bt, fname) return fname == '' end
+  use_exclude_default = true,
+  exclude = nil
 }
 --]]
 chowcho.setup = function(opt)
@@ -168,6 +174,7 @@ chowcho.setup = function(opt)
       _opt.active_border_color = opt.active_border_color
     end
     if opt.border_style ~= nil then _opt.border_style = opt.border_style end
+    if opt.use_exclude_default ~= nil then _opt.use_exclude_default = opt.use_exclude_default end
     if opt.exclude ~= nil then _opt.exclude = opt.exclude end
   else
     error('[chowcho.nvim] option is must be table')
