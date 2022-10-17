@@ -103,9 +103,12 @@ chowcho.run = function(fn, opt)
     local bt = vim.api.nvim_buf_get_option(buf, 'buftype')
     if bt ~= 'prompt' then
       local fname = vim.fn.expand('#' .. buf .. ':t')
-      if opt_local.use_exclude_default or opt_local.exclude == nil then
+
+      if opt_local.use_exclude_default then
         if fname == '' then goto continue end
-      else
+      end
+
+      if opt_local.exclude ~= nil then
         if opt_local.exclude(buf, v) then goto continue end
       end
 
@@ -149,7 +152,7 @@ chowcho.run = function(fn, opt)
       end
     end
     win_close()
-    timer:close()
+    timer:stop()
   end))
 
 end
