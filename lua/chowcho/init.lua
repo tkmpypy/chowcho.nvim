@@ -98,6 +98,7 @@ chowcho.run = function(fn, opt)
 
   local _wins = {}
   for i, v in ipairs(wins) do
+    if not vim.api.nvim_win_is_valid(v) then goto continue end
     local pos = calc_center_win_pos(v)
     local buf = vim.api.nvim_win_get_buf(v)
     local bt = vim.api.nvim_buf_get_option(buf, 'buftype')
