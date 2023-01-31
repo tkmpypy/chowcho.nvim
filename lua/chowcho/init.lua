@@ -13,6 +13,7 @@ local _opt = {
   border_style = 'default',
   use_exclude_default = true,
   exclude = nil,
+  zindex = 10000,
 }
 
 local _border_style = {
@@ -120,7 +121,7 @@ chowcho.run = function(fn, opt)
       end
       local bufnr, f_win, win = ui.create_floating_win(pos.w, pos.h, v,
                                                        {str(i), fname},
-                                                       _border_style[opt_local.border_style])
+                                                       _border_style[opt_local.border_style],_opt.zindex)
 
       if is_enable_icon(opt_local) then
         local line = vim.api.nvim_buf_get_lines(bufnr, 1, 2, false)
@@ -180,6 +181,7 @@ chowcho.setup = function(opt)
     if opt.border_style ~= nil then _opt.border_style = opt.border_style end
     if opt.use_exclude_default ~= nil then _opt.use_exclude_default = opt.use_exclude_default end
     if opt.exclude ~= nil then _opt.exclude = opt.exclude end
+    if opt.zindex ~= nil then _opt.zindex = opt.zindex end
   else
     error('[chowcho.nvim] option is must be table')
   end
