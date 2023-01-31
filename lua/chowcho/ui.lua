@@ -29,7 +29,7 @@ local create_content = function(label, border_style)
   return {top, content, bottom}
 end
 
-ui.create_floating_win = function(x, y, win, label, border_style)
+ui.create_floating_win = function(x, y, win, label, border_style, zindex)
   local buf = vim.api.nvim_create_buf(false, true)
 
   local win_num = label[1]
@@ -48,7 +48,8 @@ ui.create_floating_win = function(x, y, win, label, border_style)
     row = y,
     anchor = 'NW',
     style = 'minimal',
-    focusable = false
+    focusable = false,
+    zindex = zindex,
   }
 
   local float_win = vim.api.nvim_open_win(buf, false, opt)

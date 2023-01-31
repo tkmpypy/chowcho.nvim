@@ -44,7 +44,8 @@ require('chowcho').setup {
     -- Note that below is identical to the `use_exclude_default = true`.
     local fname = vim.fn.expand('#' .. buf .. ':t')
     return fname == ''
-  end
+  end,
+  zindex = 10000, -- sufficiently large value to show on top of the other windows
 }
 ```
 
