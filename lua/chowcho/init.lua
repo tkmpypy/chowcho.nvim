@@ -10,33 +10,10 @@ local _opt = {
   text_color = "#FFFFFF",
   bg_color = nil,
   active_border_color = "#B400C8",
-  border_style = "default",
+  border_style = "single",
   use_exclude_default = true,
   exclude = nil,
   zindex = 10000,
-}
-
-local _border_style = {
-  default = {
-    topleft = "╔",
-    topright = "╗",
-    top = "═",
-    left = "║",
-    right = "║",
-    botleft = "╚",
-    botright = "╝",
-    bot = "═",
-  },
-  rounded = {
-    topleft = "╭",
-    topright = "╮",
-    top = "─",
-    left = "│",
-    right = "│",
-    botleft = "╰",
-    botright = "╯",
-    bot = "─",
-  },
 }
 
 local str = function(v)
@@ -61,12 +38,6 @@ local calc_center_win_pos = function(win)
   local h = vim.api.nvim_win_get_height(win)
 
   return { w = math.ceil(w / 2), h = math.ceil(h / 2) }
-end
-
-local hi_active_float = function(f_win, opt)
-  for _, v in pairs(_border_style[opt.border_style]) do
-    vim.fn.matchadd("ChowchoActiveFloat", v, 0, -1, { window = f_win })
-  end
 end
 
 local set_highlight = function(opt)
@@ -106,7 +77,7 @@ chowcho.run = function(fn, opt)
     end
     local pos = calc_center_win_pos(v)
     local buf = vim.api.nvim_win_get_buf(v)
-    local bt = vim.api.nvim_buf_get_option(buf, "buftype")
+    local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
     if bt ~= "prompt" then
       local fname = vim.fn.expand("#" .. buf .. ":t")
 
@@ -128,10 +99,10 @@ chowcho.run = function(fn, opt)
         fname = icon .. " " .. fname
       end
       local bufnr, f_win, win =
-        ui.create_floating_win(pos.w, pos.h, v, { str(i), fname }, _border_style[opt_local.border_style], _opt.zindex)
+        ui.create_floating_win(pos.w, pos.h, v, { str(i), fname }, opt_local.border_style, _opt.zindex)
 
       if is_enable_icon(opt_local) then
-        local line = vim.api.nvim_buf_get_lines(bufnr, 1, 2, false)
+        local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)
         local icon_col = line[1]:find(icon)
         local end_col = icon_col + vim.fn.strlen(icon)
         vim.api.nvim_buf_add_highlight(bufnr, -1, hl_name, 1, icon_col, end_col)
@@ -140,7 +111,7 @@ chowcho.run = function(fn, opt)
       table.insert(_wins, win)
 
       if v == current_win then
-        hi_active_float(f_win, opt_local)
+        vim.api.nvim_set_option_value("winhl", "FloatBorder:ChowchoActiveFloat", { win = f_win })
       end
     end
     ::continue::
@@ -188,6 +159,12 @@ chowcho.setup = function(opt)
   else
     error("[chowcho.nvim] option is must be table")
   end
+
+  -- link highlights float border
+  -- vim.cmd([[
+  --   hi! link FloatBorder ChowchoFloat
+  --   hi! link FloatBorder ChowchoActiveFloat
+  -- ]])
 end
 
 return chowcho
