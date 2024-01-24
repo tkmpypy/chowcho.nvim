@@ -1,22 +1,22 @@
-local util = require('chowcho.util')
+local util = require("chowcho.util")
 local ui = {}
 
 local create_content = function(label, border_style)
   local no = label[1]
   local fname = label[2]
-  local content = '[' .. no .. ']' .. ' ' .. fname
+  local content = "[" .. no .. "]" .. " " .. fname
   local width = vim.fn.strwidth(content) + 2
   local border = border_style
 
   -- top and bottom
-  local top = ''
-  local bottom = ''
+  local top = ""
+  local bottom = ""
   for i = 1, width do
-    if (i == 1) then
+    if i == 1 then
       top = border.topleft .. top
       bottom = border.botleft .. bottom
       content = border.left .. content
-    elseif (i == width) then
+    elseif i == width then
       top = top .. border.topright
       bottom = bottom .. border.botright
       content = content .. border.right
@@ -26,7 +26,7 @@ local create_content = function(label, border_style)
     end
   end
 
-  return {top, content, bottom}
+  return { top, content, bottom }
 end
 
 ui.create_floating_win = function(x, y, win, label, border_style, zindex)
@@ -41,30 +41,29 @@ ui.create_floating_win = function(x, y, win, label, border_style, zindex)
   local _content_w = vim.api.nvim_strwidth(content_tbl[2])
   local opt = {
     win = win,
-    relative = 'win',
+    relative = "win",
     width = _content_w,
     height = 3,
     col = _x,
     row = y,
-    anchor = 'NW',
-    style = 'minimal',
+    anchor = "NW",
+    style = "minimal",
     focusable = false,
     zindex = zindex,
   }
 
   local float_win = vim.api.nvim_open_win(buf, false, opt)
 
-  vim.api.nvim_win_set_option(float_win, 'winhl', 'Normal:ChowchoFloat')
+  vim.api.nvim_win_set_option(float_win, "winhl", "Normal:ChowchoFloat")
 
-  return buf, float_win, {no = win_num, win = win, float = float_win}
+  return buf, float_win, { no = win_num, win = win, float = float_win }
 end
 
 ui.get_icon = function(fname)
-  local ext = util.split(fname, '.')
-  ext = ext[#ext] or ''
-  local icon, hl_name = require('nvim-web-devicons').get_icon(fname, ext,
-                                                        {default = true})
-  return icon or '', hl_name or ''
+  local ext = util.split(fname, ".")
+  ext = ext[#ext] or ""
+  local icon, hl_name = require("nvim-web-devicons").get_icon(fname, ext, { default = true })
+  return icon or "", hl_name or ""
 end
 
 return ui
