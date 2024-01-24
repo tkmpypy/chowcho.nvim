@@ -184,30 +184,7 @@ end
 --]]
 chowcho.setup = function(opt)
   if type(opt) == "table" then
-    if opt.icon_enabled ~= nil then
-      _opt.icon_enabled = opt.icon_enabled
-    end
-    if opt.text_color ~= nil then
-      _opt.text_color = opt.text_color
-    end
-    if opt.bg_color ~= nil then
-      _opt.bg_color = opt.bg_color
-    end
-    if opt.active_border_color ~= nil then
-      _opt.active_border_color = opt.active_border_color
-    end
-    if opt.border_style ~= nil then
-      _opt.border_style = opt.border_style
-    end
-    if opt.use_exclude_default ~= nil then
-      _opt.use_exclude_default = opt.use_exclude_default
-    end
-    if opt.exclude ~= nil then
-      _opt.exclude = opt.exclude
-    end
-    if opt.zindex ~= nil then
-      _opt.zindex = opt.zindex
-    end
+    _opt = vim.tbl_deep_extend("force", _opt, opt)
   else
     error("[chowcho.nvim] option is must be table")
   end
