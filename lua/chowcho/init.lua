@@ -131,9 +131,9 @@ chowcho.run = function(fn, opt)
 
       if is_enable_icon(opt_local) then
         local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)
-        local icon_col = line[1]:find(icon)
+        local icon_col = line[1]:find(icon) - 1
         local end_col = icon_col + vim.fn.strlen(icon)
-        vim.api.nvim_buf_add_highlight(bufnr, -1, hl_name, 1, icon_col, end_col)
+        vim.api.nvim_buf_add_highlight(bufnr, -1, hl_name, 0, icon_col, end_col)
       end
       table.insert(_float_wins, f_win)
       table.insert(_wins, win)
