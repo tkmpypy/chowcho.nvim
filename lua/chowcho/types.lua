@@ -1,0 +1,11 @@
+---@alias Chowcho.BorderStyleType "none"|"single"|"double"|"rounded"|"solid"|"shadow"
+
+---@class Chowcho.Config
+---@field icon_enabled boolean
+---@field active_border_color? string
+---@field deactive_border_color? string
+---@field active_text_color? string
+---@field deactive_text_color? string
+---@field border_style Chowcho.BorderStyleType
+---@field exclude? fun(buf:integer, win:integer):boolean
+---@field zindex integer
