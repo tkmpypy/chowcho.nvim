@@ -25,7 +25,6 @@ ui.create_floating_win = function(x, y, win, label, border_style, zindex)
     title = label[1],
     title_pos = "center",
   }
-
   local float_win = vim.api.nvim_open_win(buf, false, opt)
 
   return buf, float_win, { no = win_num, win = win, float = float_win }

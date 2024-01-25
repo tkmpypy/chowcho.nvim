@@ -32,20 +32,22 @@ call `setup` function
 
 ```lua
 require('chowcho').setup {
-  icon_enabled = true, -- required 'nvim-web-devicons' (default: false)
-  text_color = '#FFFFFF',
-  bg_color = '#555555',
-  active_border_color = '#0A8BFF',
-  border_style = 'rounded', -- default is 'single'. See details ':h nvim_open_win'
-  use_exclude_default = false,
-  exclude = function(buf, win)
-    -- Exclude a window from the choice based on its buffer information.
-    -- This option is applied iff `use_exclude_default = false`.
-    -- Note that below is identical to the `use_exclude_default = true`.
-    local fname = vim.fn.expand('#' .. buf .. ':t')
-    return fname == ''
-  end,
-  zindex = 10000, -- sufficiently large value to show on top of the other windows
+    border_style = "rounded",
+    active_border_color = "#b400c8",
+    active_text_color = "#ffffff",
+    deactive_border_color = "#fefefe",
+    deactive_text_color = "#d0d0d0",
+    icon_enabled = true,
+    use_default_exclude = true,
+    exclude = function(buf, win)
+      -- exclude noice.nvim's cmdline_popup
+      local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
+      local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
+      if bt == "nofile" and (ft == "noice" or ft == "vim") then
+        return true
+      end
+      return false
+    end,
 }
 ```
 
