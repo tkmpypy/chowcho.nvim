@@ -7,9 +7,10 @@ local _float_wins = {}
 -- for default options
 local _opt = {
   icon_enabled = false,
-  text_color = "#FFFFFF",
-  bg_color = nil,
-  active_border_color = "#B400C8",
+  active_border_color = nil,
+  deactive_border_color = nil,
+  active_text_color = nil,
+  deactive_text_color = nil,
   border_style = "single",
   use_exclude_default = true,
   exclude = nil,
@@ -41,13 +42,35 @@ local calc_center_win_pos = function(win)
 end
 
 local set_highlight = function(opt)
-  if opt.bg_color == nil or opt.bg_color == "" then
-    vim.cmd("hi! ChowchoFloat guifg=" .. opt.text_color)
-    vim.cmd("hi! ChowchoActiveFloat guifg=" .. opt.active_border_color)
-  else
-    vim.cmd("hi! ChowchoFloat guifg=" .. opt.text_color .. " guibg=" .. opt.bg_color)
-    vim.cmd("hi! ChowchoActiveFloat guifg=" .. opt.active_border_color .. " guibg=" .. opt.bg_color)
+  local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
+  local float_hl = vim.api.nvim_get_hl(0, { name = "FloatBorder" })
+  local sp_hl = vim.api.nvim_get_hl(0, { name = "Special" })
+
+  if opt.active_border_color == nil then
+    opt.active_border_color = string.format("#%06x", sp_hl.fg)
   end
+  if opt.active_text_color == nil then
+    opt.active_text_color = string.format("#%06x", normal_hl.fg)
+  end
+  if opt.deactive_border_color == nil then
+    opt.deactive_border_color = string.format("#%06x", float_hl.fg)
+  end
+  if opt.deactive_text_color == nil then
+    opt.deactive_text_color = string.format("#%06x", normal_hl.fg)
+  end
+
+  vim.api.nvim_set_hl(0, "ChowchoFloatBorder", {
+    fg = opt.deactive_border_color,
+  })
+  vim.api.nvim_set_hl(0, "ChowchoFloatText", {
+    fg = opt.deactive_text_color,
+  })
+  vim.api.nvim_set_hl(0, "ChowchoActiveFloatBorder", {
+    fg = opt.active_border_color,
+  })
+  vim.api.nvim_set_hl(0, "ChowchoActiveFloatText", {
+    fg = opt.active_text_color,
+  })
 end
 
 local win_close = function()
@@ -100,6 +123,11 @@ chowcho.run = function(fn, opt)
       end
       local bufnr, f_win, win =
         ui.create_floating_win(pos.w, pos.h, v, { str(i), fname }, opt_local.border_style, _opt.zindex)
+      vim.api.nvim_set_option_value(
+        "winhl",
+        "FloatBorder:ChowchoFloatBorder,NormalFloat:ChowchoFloatText",
+        { win = f_win }
+      )
 
       if is_enable_icon(opt_local) then
         local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)
@@ -111,7 +139,11 @@ chowcho.run = function(fn, opt)
       table.insert(_wins, win)
 
       if v == current_win then
-        vim.api.nvim_set_option_value("winhl", "FloatBorder:ChowchoActiveFloat", { win = f_win })
+        vim.api.nvim_set_option_value(
+          "winhl",
+          "FloatBorder:ChowchoActiveFloatBorder,NormalFloat:ChowchoActiveFloatText",
+          { win = f_win }
+        )
       end
     end
     ::continue::
@@ -142,29 +174,12 @@ chowcho.run = function(fn, opt)
   )
 end
 
---[[
-{
-  icon_enabled = true,
-  text_color = '#FFFFFF',
-  bg_color = '#555555',
-  active_border_color = '#B400C8',
-  border_style = 'rounded' -- 'default', 'rounded',
-  use_exclude_default = true,
-  exclude = nil
-}
---]]
 chowcho.setup = function(opt)
   if type(opt) == "table" then
     _opt = vim.tbl_deep_extend("force", _opt, opt)
   else
     error("[chowcho.nvim] option is must be table")
   end
-
-  -- link highlights float border
-  -- vim.cmd([[
-  --   hi! link FloatBorder ChowchoFloat
-  --   hi! link FloatBorder ChowchoActiveFloat
-  -- ]])
 end
 
 return chowcho
