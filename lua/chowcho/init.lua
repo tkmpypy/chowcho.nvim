@@ -1,4 +1,5 @@
 local ui = require("chowcho.ui")
+local util = require("chowcho.util")
 
 local chowcho = {}
 
@@ -112,10 +113,9 @@ chowcho.run = function(fn, opt)
     end
 
     if #opt_local.labels < i then
-      vim.notify(
+      util.logger.notify(
         "The number of windows exceeds the maximum number.\nThe maximum number is determined by the length of the labels array.",
-        vim.log.levels.WARN,
-        { title = "Chowcho" }
+        vim.log.levels.WARN
       )
       break
     end

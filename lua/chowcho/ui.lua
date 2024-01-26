@@ -29,7 +29,7 @@ ui.create_floating_win = function(x, y, win, contents, border_style, zindex)
 end
 
 ui.get_icon = function(fname)
-  local ext = util.split(fname, ".")
+  local ext = util.str.split(fname, ".")
   ext = ext[#ext] or ""
   local icon, hl_name = require("nvim-web-devicons").get_icon(fname, ext, { default = true })
   return icon or "", hl_name or ""
