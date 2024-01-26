@@ -4,8 +4,10 @@ local chowcho = {}
 
 local _float_wins = {}
 
--- for default options
-local _opt = {
+--TODO:
+--  - Add label color
+---@type Chowcho.Config
+local _default_opts = {
   icon_enabled = false,
   active_border_color = nil,
   deactive_border_color = nil,
@@ -15,11 +17,8 @@ local _opt = {
   use_exclude_default = true,
   exclude = nil,
   zindex = 10000,
+  labels = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
 }
-
-local str = function(v)
-  return v .. ""
-end
 
 local is_enable_icon = function(opt)
   if opt.icon_enabled then
@@ -82,22 +81,30 @@ local win_close = function()
   end
 end
 
+---@type Chowcho.RunFn
 chowcho.run = function(fn, opt)
-  local opt_local = {}
-  opt = opt or _opt
-  for k, v in pairs(_opt) do
-    opt_local[k] = opt[k] ~= nil and opt[k] or v
-  end
+  local opt_local = vim.tbl_deep_extend("force", _default_opts, opt or {})
   local wins = vim.api.nvim_tabpage_list_wins(0)
   local current_win = vim.api.nvim_get_current_win()
 
   set_highlight(opt_local)
 
+  ---@type Chowcho.UI.Window[]
   local _wins = {}
   for i, v in ipairs(wins) do
     if not vim.api.nvim_win_is_valid(v) then
       goto continue
     end
+
+    if #opt_local.labels < i then
+      vim.notify(
+        "The number of windows exceeds the maximum number.\nThe maximum number is determined by the length of the labels array.",
+        vim.log.levels.WARN,
+        { title = "Chowcho" }
+      )
+      break
+    end
+
     local pos = calc_center_win_pos(v)
     local buf = vim.api.nvim_win_get_buf(v)
     local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
@@ -121,8 +128,14 @@ chowcho.run = function(fn, opt)
         icon, hl_name = ui.get_icon(fname)
         fname = icon .. " " .. fname
       end
-      local bufnr, f_win, win =
-        ui.create_floating_win(pos.w, pos.h, v, { str(i), fname }, opt_local.border_style, _opt.zindex)
+      local bufnr, f_win, win = ui.create_floating_win(
+        pos.w,
+        pos.h,
+        v,
+        { label = opt_local.labels[i], name = fname },
+        opt_local.border_style,
+        opt_local.zindex
+      )
       vim.api.nvim_set_option_value(
         "winhl",
         "FloatBorder:ChowchoFloatBorder,NormalFloat:ChowchoFloatText",
@@ -160,7 +173,7 @@ chowcho.run = function(fn, opt)
         if val ~= nil then
           for _, v in ipairs(_wins) do
             if v ~= nil then
-              if v.no == str(val) then
+              if v.label == val then
                 (fn or vim.api.nvim_set_current_win)(v.win)
                 break
               end
@@ -176,7 +189,7 @@ end
 
 chowcho.setup = function(opt)
   if type(opt) == "table" then
-    _opt = vim.tbl_deep_extend("force", _opt, opt)
+    _default_opts = vim.tbl_deep_extend("force", _default_opts, opt)
   else
     error("[chowcho.nvim] option is must be table")
   end
