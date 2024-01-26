@@ -13,6 +13,8 @@ local _default_opts = {
   deactive_border_color = nil,
   active_text_color = nil,
   deactive_text_color = nil,
+  active_label_color = nil,
+  deactive_label_color = nil,
   border_style = "single",
   use_exclude_default = true,
   exclude = nil,
@@ -42,20 +44,27 @@ end
 
 local set_highlight = function(opt)
   local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
-  local float_hl = vim.api.nvim_get_hl(0, { name = "FloatBorder" })
+  local float_border_hl = vim.api.nvim_get_hl(0, { name = "FloatBorder" })
+  local float_title_hl = vim.api.nvim_get_hl(0, { name = "FloatTitle" })
   local sp_hl = vim.api.nvim_get_hl(0, { name = "Special" })
 
   if opt.active_border_color == nil then
     opt.active_border_color = string.format("#%06x", sp_hl.fg)
   end
   if opt.active_text_color == nil then
-    opt.active_text_color = string.format("#%06x", normal_hl.fg)
+    opt.active_text_color = string.format("#%06x", float_title_hl.fg)
+  end
+  if opt.active_label_color == nil then
+    opt.active_label_color = string.format("#%06x", normal_hl.fg)
   end
   if opt.deactive_border_color == nil then
-    opt.deactive_border_color = string.format("#%06x", float_hl.fg)
+    opt.deactive_border_color = string.format("#%06x", float_border_hl.fg)
   end
   if opt.deactive_text_color == nil then
     opt.deactive_text_color = string.format("#%06x", normal_hl.fg)
+  end
+  if opt.deactive_label_color == nil then
+    opt.deactive_label_color = string.format("#%06x", float_title_hl.fg)
   end
 
   vim.api.nvim_set_hl(0, "ChowchoFloatBorder", {
@@ -64,11 +73,17 @@ local set_highlight = function(opt)
   vim.api.nvim_set_hl(0, "ChowchoFloatText", {
     fg = opt.deactive_text_color,
   })
+  vim.api.nvim_set_hl(0, "ChowchoFloatTitle", {
+    fg = opt.deactive_label_color,
+  })
   vim.api.nvim_set_hl(0, "ChowchoActiveFloatBorder", {
     fg = opt.active_border_color,
   })
   vim.api.nvim_set_hl(0, "ChowchoActiveFloatText", {
     fg = opt.active_text_color,
+  })
+  vim.api.nvim_set_hl(0, "ChowchoActiveFloatTitle", {
+    fg = opt.active_label_color,
   })
 end
 
@@ -138,7 +153,7 @@ chowcho.run = function(fn, opt)
       )
       vim.api.nvim_set_option_value(
         "winhl",
-        "FloatBorder:ChowchoFloatBorder,NormalFloat:ChowchoFloatText",
+        "FloatTitle:ChowchoFloatTitle,FloatBorder:ChowchoFloatBorder,NormalFloat:ChowchoFloatText",
         { win = f_win }
       )
 
@@ -154,7 +169,7 @@ chowcho.run = function(fn, opt)
       if v == current_win then
         vim.api.nvim_set_option_value(
           "winhl",
-          "FloatBorder:ChowchoActiveFloatBorder,NormalFloat:ChowchoActiveFloatText",
+          "FloatTitle:ChowchoActiveFloatTitle,FloatBorder:ChowchoActiveFloatBorder,NormalFloat:ChowchoActiveFloatText",
           { win = f_win }
         )
       end
