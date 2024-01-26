@@ -39,6 +39,8 @@ require('chowcho').setup {
     deactive_text_color = "#d0d0d0",
     icon_enabled = true,
     use_default_exclude = true,
+    -- Must be a single character. The length of the array is the maximum number of windows that can be moved.
+    labels = { "a", "b", "c", "d", "e", "f", "g", "h", "i" },
     exclude = function(buf, win)
       -- exclude noice.nvim's cmdline_popup
       local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
