@@ -6,6 +6,8 @@
 ---@field public deactive_border_color? string
 ---@field public active_text_color? string
 ---@field public deactive_text_color? string
+---@field public active_label_color? string
+---@field public deactive_label_color? string
 ---@field public border_style Chowcho.BorderStyleType
 ---@field public use_exclude_default boolean
 ---@field public exclude? fun(buf:integer, win:integer):boolean
