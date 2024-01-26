@@ -1,6 +1,9 @@
-local util = {}
+local util = {
+  str = {},
+  logger = {},
+}
 
-util.split = function(str, ts)
+util.str.split = function(str, ts)
   if ts == nil then
     return {}
   end
@@ -13,6 +16,12 @@ util.split = function(str, ts)
   end
 
   return t
+end
+
+---@param msg string
+---@param level integer
+util.logger.notify = function(msg, level)
+  vim.notify(msg, level, { title = "Chowcho" })
 end
 
 return util
