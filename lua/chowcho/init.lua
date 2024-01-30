@@ -51,15 +51,47 @@ local set_highlights = function(opt)
   set_highlight(opt, "deactive_label_color", "ChowchoFloatTitle", float_title_hl.fg)
 end
 
+---@param wins integer[]
+---@return integer[]
+local filter_wins = function(wins)
+  local ret = {}
+  for _, v in ipairs(wins) do
+    local buf = vim.api.nvim_win_get_buf(v)
+    local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
+    local fname = vim.fs.basename(vim.api.nvim_buf_get_name(buf))
+    if bt == "prompt" then
+      goto continue
+    elseif bt == "nofile" and fname == "" then
+      goto continue
     end
+
+    table.insert(ret, v)
+    ::continue::
   end
+
+  return ret
 end
 
 ---@type Chowcho.RunFn
 chowcho.run = function(fn, opt)
   local opt_local = vim.tbl_deep_extend("force", _default_opts, opt or {})
-  local wins = vim.api.nvim_tabpage_list_wins(0)
-  local current_win = vim.api.nvim_get_current_win()
+  -- print(vim.inspect(opt_local)) -- TODO: debug
+
+  ---@type integer[]
+  local wins = {}
+  if opt_local.use_exclude_default then
+    wins = filter_wins(vim.api.nvim_tabpage_list_wins(0))
+  else
+    wins = vim.api.nvim_tabpage_list_wins(0)
+  end
+
+  if #opt_local.labels < #wins then
+    util.logger.notify(
+      "The number of windows exceeds the maximum number.\nThe maximum number is determined by the length of the labels array.",
+      vim.log.levels.WARN
+    )
+    return
+  end
 
   set_highlights(opt_local)
 
@@ -71,30 +103,14 @@ chowcho.run = function(fn, opt)
       goto continue
     end
 
-    if #opt_local.labels < i then
-      util.logger.notify(
-        "The number of windows exceeds the maximum number.\nThe maximum number is determined by the length of the labels array.",
-        vim.log.levels.WARN
-      )
-      break
+    local buf = vim.api.nvim_win_get_buf(v)
+
+    if opt_local.exclude ~= nil then
+      if opt_local.exclude(buf, v) then
+        goto continue
+      end
     end
 
-    local buf = vim.api.nvim_win_get_buf(v)
-    local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
-    if bt ~= "prompt" then
-      local fname = vim.fn.expand("#" .. buf .. ":t")
-
-      if opt_local.use_exclude_default then
-        if fname == "" then
-          goto continue
-        end
-      end
-
-      if opt_local.exclude ~= nil then
-        if opt_local.exclude(buf, v) then
-          goto continue
-        end
-      end
     local win_label = select_manager:show(i, v)
     table.insert(_wins, win_label)
 
