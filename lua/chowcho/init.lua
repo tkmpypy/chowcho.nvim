@@ -1,12 +1,11 @@
 local ui = require("chowcho.ui")
 local util = require("chowcho.util")
+local selector = require("chowcho.selector")
 
 local chowcho = {}
 
 local _float_wins = {}
 
---TODO:
---  - Add label color
 ---@type Chowcho.Config
 local _default_opts = {
   icon_enabled = false,
@@ -21,27 +20,8 @@ local _default_opts = {
   exclude = nil,
   zindex = 10000,
   labels = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+  selector = "float",
 }
-
-local is_enable_icon = function(opt)
-  if opt.icon_enabled then
-    local loaded_devicons = vim.api.nvim_get_var("loaded_devicons")
-    if loaded_devicons < 1 then
-      return false
-    end
-
-    return require("nvim-web-devicons").has_loaded()
-  end
-
-  return false
-end
-
-local calc_center_win_pos = function(win)
-  local w = vim.api.nvim_win_get_width(win)
-  local h = vim.api.nvim_win_get_height(win)
-
-  return { w = math.ceil(w / 2), h = math.ceil(h / 2) }
-end
 
 ---@param opt Chowcho.Config
 ---@param opt_name string
@@ -71,11 +51,6 @@ local set_highlights = function(opt)
   set_highlight(opt, "deactive_label_color", "ChowchoFloatTitle", float_title_hl.fg)
 end
 
-local win_close = function()
-  for i, v in ipairs(_float_wins) do
-    if v ~= nil then
-      vim.api.nvim_win_close(v, true)
-      _float_wins[i] = nil
     end
   end
 end
@@ -90,6 +65,7 @@ chowcho.run = function(fn, opt)
 
   ---@type Chowcho.UI.Window[]
   local _wins = {}
+  local select_manager = selector.new(opt_local)
   for i, v in ipairs(wins) do
     if not vim.api.nvim_win_is_valid(v) then
       goto continue
@@ -103,7 +79,6 @@ chowcho.run = function(fn, opt)
       break
     end
 
-    local pos = calc_center_win_pos(v)
     local buf = vim.api.nvim_win_get_buf(v)
     local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
     if bt ~= "prompt" then
@@ -120,43 +95,9 @@ chowcho.run = function(fn, opt)
           goto continue
         end
       end
+    local win_label = select_manager:show(i, v)
+    table.insert(_wins, win_label)
 
-      local icon, hl_name = "", ""
-      if is_enable_icon(opt_local) then
-        icon, hl_name = ui.get_icon(fname)
-        fname = icon .. " " .. fname
-      end
-      local bufnr, f_win, win = ui.create_floating_win(
-        pos.w,
-        pos.h,
-        v,
-        { label = opt_local.labels[i], name = fname },
-        opt_local.border_style,
-        opt_local.zindex
-      )
-      vim.api.nvim_set_option_value(
-        "winhl",
-        "FloatTitle:ChowchoFloatTitle,FloatBorder:ChowchoFloatBorder,NormalFloat:ChowchoFloatText",
-        { win = f_win }
-      )
-
-      if is_enable_icon(opt_local) then
-        local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)
-        local icon_col = line[1]:find(icon) - 1
-        local end_col = icon_col + vim.fn.strlen(icon)
-        vim.api.nvim_buf_add_highlight(bufnr, -1, hl_name, 0, icon_col, end_col)
-      end
-      table.insert(_float_wins, f_win)
-      table.insert(_wins, win)
-
-      if v == current_win then
-        vim.api.nvim_set_option_value(
-          "winhl",
-          "FloatTitle:ChowchoActiveFloatTitle,FloatBorder:ChowchoActiveFloatBorder,NormalFloat:ChowchoActiveFloatText",
-          { win = f_win }
-        )
-      end
-    end
     ::continue::
   end
 
@@ -179,7 +120,7 @@ chowcho.run = function(fn, opt)
           end
         end
       end
-      win_close()
+      select_manager:hide()
       timer:stop()
     end)
   )
