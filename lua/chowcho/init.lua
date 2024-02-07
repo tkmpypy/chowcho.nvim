@@ -1,10 +1,7 @@
-local ui = require("chowcho.ui")
 local util = require("chowcho.util")
 local selector = require("chowcho.selector")
 
 local chowcho = {}
-
-local _float_wins = {}
 
 ---@type Chowcho.Config
 local _default_opts = {
@@ -75,14 +72,11 @@ end
 ---@type Chowcho.RunFn
 chowcho.run = function(fn, opt)
   local opt_local = vim.tbl_deep_extend("force", _default_opts, opt or {})
-  -- print(vim.inspect(opt_local)) -- TODO: debug
 
   ---@type integer[]
-  local wins = {}
+  local wins = vim.api.nvim_tabpage_list_wins(0)
   if opt_local.use_exclude_default then
-    wins = filter_wins(vim.api.nvim_tabpage_list_wins(0))
-  else
-    wins = vim.api.nvim_tabpage_list_wins(0)
+    wins = filter_wins(wins)
   end
 
   if #opt_local.labels < #wins then
@@ -117,36 +111,31 @@ chowcho.run = function(fn, opt)
     ::continue::
   end
 
-  local timer = vim.loop.new_timer()
-  timer:start(
-    10,
-    0,
-    vim.schedule_wrap(function()
-      local success, val = pcall(vim.fn.getchar)
-      if success then
-        val = vim.fn.nr2char(val)
-        if val ~= nil then
-          for _, v in ipairs(_wins) do
-            if v ~= nil then
-              if v.label == val then
-                (fn or vim.api.nvim_set_current_win)(v.win)
-                break
-              end
-            end
+  vim.cmd.redraw()
+
+  local success, val = pcall(vim.fn.getchar)
+  if success then
+    val = vim.fn.nr2char(val)
+    if val ~= nil then
+      for _, v in ipairs(_wins) do
+        if v ~= nil then
+          if v.label == val then
+            (fn or vim.api.nvim_set_current_win)(v.win)
           end
         end
       end
-      select_manager:hide()
-      timer:stop()
-    end)
-  )
+    end
+  end
+
+  select_manager:hide()
+  vim.cmd.redraw()
 end
 
 chowcho.setup = function(opt)
   if type(opt) == "table" then
     _default_opts = vim.tbl_deep_extend("force", _default_opts, opt)
   else
-    error("[chowcho.nvim] option is must be table")
+    util.logger.notify("option is must be table", vim.log.levels.ERROR)
   end
 end
 
