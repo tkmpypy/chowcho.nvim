@@ -34,13 +34,16 @@ call `setup` function
 require('chowcho').setup {
     border_style = "rounded",
     active_border_color = "#b400c8",
-    active_text_color = "#ffffff",
+    active_text_color = "#fefefe",
+    active_label_color = "#C8CFFF",
     deactive_border_color = "#fefefe",
     deactive_text_color = "#d0d0d0",
+    deactive_label_color = "#ABABAB",
     icon_enabled = true,
     use_default_exclude = true,
     -- Must be a single character. The length of the array is the maximum number of windows that can be moved.
     labels = { "a", "b", "c", "d", "e", "f", "g", "h", "i" },
+    selector = "statusline", -- `float` or `statusline` (default: `float`)
     exclude = function(buf, win)
       -- exclude noice.nvim's cmdline_popup
       local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })

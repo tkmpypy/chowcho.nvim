@@ -1,6 +1,6 @@
 local util = require("chowcho.util")
 local float = require("chowcho.selector.float")
-local winbar = require("chowcho.selector.winbar")
+local statusline = require("chowcho.selector.statusline")
 
 local M = {}
 
@@ -10,10 +10,10 @@ M.new = function(opts)
   local obj = {}
   if opts.selector == "float" then
     obj.selector = float.new(opts)
-  elseif opts.selector == "winbar" then
-    obj.selector = winbar.new(opts)
+  elseif opts.selector == "statusline" then
+    obj.selector = statusline.new(opts)
   else
-    util.logger.notify(string.format("%s is invalid selector type", ty), vim.log.levels.ERROR)
+    util.logger.notify(string.format("%s is invalid selector type", obj.selector), vim.log.levels.ERROR)
     obj.selector = nil
   end
   setmetatable(obj, { __index = M })
