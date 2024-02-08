@@ -4,13 +4,13 @@ local statusline = require("chowcho.selector.statusline")
 
 local M = {}
 
----@param opts Chowcho.Config
+---@param opts Chowcho.Config.Root
 ---@return Chowcho.UI.SelectManager
 M.new = function(opts)
   local obj = {}
-  if opts.selector == "float" then
+  if opts.ui.selector_style == "float" then
     obj.selector = float.new(opts)
-  elseif opts.selector == "statusline" then
+  elseif opts.ui.selector_style == "statusline" then
     obj.selector = statusline.new(opts)
   else
     util.logger.notify(string.format("%s is invalid selector type", obj.selector), vim.log.levels.ERROR)
@@ -29,6 +29,11 @@ end
 ---@type Chowcho.UI.HideFn
 M.hide = function(self)
   self.selector:hide()
+end
+
+---@type Chowcho.UI.HighlightFn
+M.highlight = function(self)
+  self.selector:highlight()
 end
 
 return M

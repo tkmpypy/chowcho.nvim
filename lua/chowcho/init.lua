@@ -3,50 +3,46 @@ local selector = require("chowcho.selector")
 
 local chowcho = {}
 
----@type Chowcho.Config
+---@type Chowcho.Config.Root
 local _default_opts = {
-  icon_enabled = false,
-  active_border_color = nil,
-  deactive_border_color = nil,
-  active_text_color = nil,
-  deactive_text_color = nil,
-  active_label_color = nil,
-  deactive_label_color = nil,
-  border_style = "single",
+  ui = {
+    float = {
+      border_style = "single",
+      icon_enabled = false,
+      color = {
+        label = {
+          active = nil,
+          inactive = nil,
+        },
+        text = {
+          active = nil,
+          inactive = nil,
+        },
+        border = {
+          active = nil,
+          inactive = nil,
+        },
+      },
+      zindex = 10000,
+    },
+    statusline = {
+      color = {
+        label = {
+          active = "#FFFFFF",
+          inactive = "#FFFFFF",
+        },
+        background = {
+          active = "#FFFFFF",
+          inactive = "#FFFFFF",
+        },
+      },
+    },
+    labels = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+    selector_style = "float",
+  },
   use_exclude_default = true,
   exclude = nil,
-  zindex = 10000,
-  labels = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
-  selector = "float",
 }
-
----@param opt Chowcho.Config
----@param opt_name string
----@param hl_group_name string
----@param default_hl_int integer
-local set_highlight = function(opt, opt_name, hl_group_name, default_hl_int)
-  if opt[opt_name] == nil then
-    opt[opt_name] = string.format("#%06x", default_hl_int)
-  end
-
-  vim.api.nvim_set_hl(0, hl_group_name, {
-    fg = opt[opt_name],
-  })
-end
-
-local set_highlights = function(opt)
-  local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
-  local float_border_hl = vim.api.nvim_get_hl(0, { name = "FloatBorder" })
-  local float_title_hl = vim.api.nvim_get_hl(0, { name = "FloatTitle" })
-  local sp_hl = vim.api.nvim_get_hl(0, { name = "Special" })
-
-  set_highlight(opt, "active_border_color", "ChowchoActiveFloatBorder", sp_hl.fg)
-  set_highlight(opt, "active_text_color", "ChowchoActiveFloatText", float_title_hl.fg)
-  set_highlight(opt, "active_label_color", "ChowchoActiveFloatTitle", normal_hl.fg)
-  set_highlight(opt, "deactive_border_color", "ChowchoFloatBorder", float_border_hl.fg)
-  set_highlight(opt, "deactive_text_color", "ChowchoFloatText", normal_hl.fg)
-  set_highlight(opt, "deactive_label_color", "ChowchoFloatTitle", float_title_hl.fg)
-end
 
 ---@param wins integer[]
 ---@return integer[]
@@ -79,7 +75,7 @@ chowcho.run = function(fn, opt)
     wins = filter_wins(wins)
   end
 
-  if #opt_local.labels < #wins then
+  if #opt_local.ui.labels < #wins then
     util.logger.notify(
       "The number of windows exceeds the maximum number.\nThe maximum number is determined by the length of the labels array.",
       vim.log.levels.WARN
@@ -87,11 +83,10 @@ chowcho.run = function(fn, opt)
     return
   end
 
-  set_highlights(opt_local)
-
   ---@type Chowcho.UI.Window[]
   local _wins = {}
   local select_manager = selector.new(opt_local)
+  select_manager:highlight()
   for i, v in ipairs(wins) do
     if not vim.api.nvim_win_is_valid(v) then
       goto continue
