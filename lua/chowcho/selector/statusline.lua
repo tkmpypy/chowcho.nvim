@@ -1,13 +1,12 @@
-local ui = require("chowcho.ui")
-local util = require("chowcho.util")
-
+---@class Chowcho.Selector.Statusline
+---@field opts Chowcho.Config.Root
 local M = {}
 local _state = {
   windows = {},
   global = {},
 }
 
----@param opts Chowcho.Config
+---@param opts Chowcho.Config.Root
 ---@return Chowcho.UI.Selector
 M.new = function(opts)
   local obj = {
@@ -52,7 +51,7 @@ M.show = function(self, idx, win)
     table.insert(_state.windows, { win = win, statusline = vim.wo[win].statusline })
   end
 
-  local label = self.opts.labels[idx]
+  local label = self.opts.ui.labels[idx]
   vim.wo[win].statusline = "%=" .. label .. "%="
 
   return { win = win, label = label }
