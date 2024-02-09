@@ -5,7 +5,7 @@ local chowcho = {}
 
 ---@type Chowcho.Config.Root
 local _default_opts = {
-  ui = {
+  selector = {
     float = {
       border_style = "single",
       icon_enabled = false,
@@ -28,18 +28,18 @@ local _default_opts = {
     statusline = {
       color = {
         label = {
-          active = "#FFFFFF",
-          inactive = "#FFFFFF",
+          active = "#fefefe",
+          inactive = "#d0d0d0",
         },
         background = {
-          active = "#FFFFFF",
-          inactive = "#FFFFFF",
+          active = "#3d7172",
+          inactive = "#203a3a",
         },
       },
     },
-    labels = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
-    selector_style = "float",
   },
+  labels = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+  selector_style = "float",
   use_exclude_default = true,
   exclude = nil,
 }
@@ -75,7 +75,7 @@ chowcho.run = function(fn, opt)
     wins = filter_wins(wins)
   end
 
-  if #opt_local.ui.labels < #wins then
+  if #opt_local.labels < #wins then
     util.logger.notify(
       "The number of windows exceeds the maximum number.\nThe maximum number is determined by the length of the labels array.",
       vim.log.levels.WARN

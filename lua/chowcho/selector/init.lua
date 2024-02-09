@@ -8,9 +8,9 @@ local M = {}
 ---@return Chowcho.UI.SelectManager
 M.new = function(opts)
   local obj = {}
-  if opts.ui.selector_style == "float" then
+  if opts.selector_style == "float" then
     obj.selector = float.new(opts)
-  elseif opts.ui.selector_style == "statusline" then
+  elseif opts.selector_style == "statusline" then
     obj.selector = statusline.new(opts)
   else
     util.logger.notify(string.format("%s is invalid selector type", obj.selector), vim.log.levels.ERROR)
