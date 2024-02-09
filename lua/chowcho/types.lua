@@ -26,13 +26,13 @@
 ---@class Chowcho.Config.UI
 ---@field float Chowcho.Config.FloatConfig
 ---@field statusline Chowcho.Config.StatuslineConfig
----@field public labels string[] @Must be a single character. The length of the array is the maximum number of windows that can be moved.
----@field public selector_style Chowcho.SelectorType
 
 ---@class Chowcho.Config.Root
 ---@field public use_exclude_default boolean
 ---@field public exclude? fun(buf:integer, win:integer):boolean
----@field public ui Chowcho.Config.UI
+---@field public selector Chowcho.Config.UI
+---@field public labels string[] @Must be a single character. The length of the array is the maximum number of windows that can be moved.
+---@field public selector_style Chowcho.SelectorType
 
 ---@alias Chowcho.RunFn fun(fn?:fun(win:integer), opts?:Chowcho.Config.Root)
 

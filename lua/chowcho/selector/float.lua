@@ -24,9 +24,9 @@ local calc_center_win_pos = function(win)
   return { w = math.ceil(w / 2), h = math.ceil(h / 2) }
 end
 
----@param opts Chowcho.Config.UI
+---@param opts Chowcho.Config.Root
 local is_enable_icon = function(opts)
-  if opts.selector_style == "float" and opts.float.icon_enabled then
+  if opts.selector_style == "float" and opts.selector.float.icon_enabled then
     local loaded_devicons = vim.api.nvim_get_var("loaded_devicons")
     if loaded_devicons < 1 then
       return false
@@ -50,7 +50,7 @@ M.show = function(self, idx, win)
   end
 
   local icon, hl_name = "", ""
-  if is_enable_icon(self.opts.ui) then
+  if is_enable_icon(self.opts) then
     icon, hl_name = ui.get_icon(fname)
     fname = icon .. " " .. fname
   end
@@ -59,9 +59,9 @@ M.show = function(self, idx, win)
     pos.w,
     pos.h,
     win,
-    { label = self.opts.ui.labels[idx], name = fname },
-    self.opts.ui.float.border_style,
-    self.opts.ui.float.zindex
+    { label = self.opts.labels[idx], name = fname },
+    self.opts.selector.float.border_style,
+    self.opts.selector.float.zindex
   )
   vim.api.nvim_set_option_value(
     "winhl",
@@ -69,7 +69,7 @@ M.show = function(self, idx, win)
     { win = f_winnr }
   )
 
-  if is_enable_icon(self.opts.ui) then
+  if is_enable_icon(self.opts) then
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)
     local icon_col = line[1]:find(icon) - 1
     local end_col = icon_col + vim.fn.strlen(icon)
@@ -100,7 +100,7 @@ end
 
 ---@type Chowcho.UI.HighlightFn
 M.highlight = function(self)
-  local colors = self.opts.ui.float.color
+  local colors = self.opts.selector.float.color
   local hl_groups = {
     { name = "ChowchoActiveFloatBorder", default = "Special", color = colors.border.active },
     { name = "ChowchoActiveFloatText", default = "FloatTitle", color = colors.text.active },

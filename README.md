@@ -32,27 +32,52 @@ call `setup` function
 
 ```lua
 require('chowcho').setup {
-    border_style = "rounded",
-    active_border_color = "#b400c8",
-    active_text_color = "#fefefe",
-    active_label_color = "#C8CFFF",
-    deactive_border_color = "#fefefe",
-    deactive_text_color = "#d0d0d0",
-    deactive_label_color = "#ABABAB",
-    icon_enabled = true,
-    use_default_exclude = true,
-    -- Must be a single character. The length of the array is the maximum number of windows that can be moved.
-    labels = { "a", "b", "c", "d", "e", "f", "g", "h", "i" },
-    selector = "statusline", -- `float` or `statusline` (default: `float`)
-    exclude = function(buf, win)
-      -- exclude noice.nvim's cmdline_popup
-      local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
-      local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
-      if bt == "nofile" and (ft == "noice" or ft == "vim") then
-        return true
-      end
-      return false
-    end,
+  -- Must be a single character. The length of the array is the maximum number of windows that can be moved.
+  labels = { "a", "b", "c", "d", "e", "f", "g", "h", "i" },
+  selector = "statusline", -- `float` or `statusline` (default: `float`)
+  use_exclude_default = true,
+  exclude = function(buf, win)
+    -- exclude noice.nvim's cmdline_popup
+    local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })
+    local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
+    if bt == "nofile" and (ft == "noice" or ft == "vim") then
+      return true
+    end
+    return false
+  end,
+  selector = {
+    float = {
+      border_style = "rounded",
+      icon_enabled = true,
+      color = {
+        label = {
+          active = "#c8cfff",
+          inactive = "#ababab",
+        },
+        text = {
+          active = "#fefefe",
+          inactive = "#d0d0d0",
+        },
+        border = {
+          active = "#b400c8",
+          inactive = "#fefefe",
+        },
+      },
+      zindex = 1,
+    },
+    statusline = {
+      color = {
+        label = {
+          active = "#fefefe",
+          inactive = "#d0d0d0",
+        },
+        background = {
+          active = "#3d7172",
+          inactive = "#203a3a",
+        },
+      },
+    },
+  },
 }
 ```
 
