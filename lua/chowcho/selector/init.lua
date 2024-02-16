@@ -2,10 +2,9 @@ local util = require("chowcho.util")
 local float = require("chowcho.selector.float")
 local statusline = require("chowcho.selector.statusline")
 
+---@type Chowcho.SelectManager
 local M = {}
 
----@param opts Chowcho.Config.Root
----@return Chowcho.UI.SelectManager
 M.new = function(opts)
   local obj = {}
   if opts.selector_style == "float" then
@@ -21,19 +20,28 @@ M.new = function(opts)
   return obj
 end
 
----@type Chowcho.UI.ShowFn
 M.show = function(self, idx, win)
   return self.selector:show(idx, win)
 end
 
----@type Chowcho.UI.HideFn
 M.hide = function(self)
   self.selector:hide()
 end
 
----@type Chowcho.UI.HighlightFn
 M.highlight = function(self)
   self.selector:highlight()
+end
+
+M.pre_proc = function(self)
+  if self.selector.integrator ~= nil then
+    self.selector.integrator:pre_proc()
+  end
+end
+
+M.post_proc = function(self)
+  if self.selector.integrator ~= nil then
+    self.selector.integrator:post_proc()
+  end
 end
 
 return M

@@ -1,16 +1,20 @@
----@class Chowcho.Selector.Statusline
----@field opts Chowcho.Config.Root
+local integ = require("chowcho.integrator")
+local winsep = require("chowcho.integrator.colorful-winsep")
+
+---@type Chowcho.Selector
 local M = {}
 local _state = {
   windows = {},
   global = {},
 }
 
----@param opts Chowcho.Config.Root
----@return Chowcho.UI.Selector
 M.new = function(opts)
+  local integrator = integ.new()
+  integrator:register(winsep.new())
+
   local obj = {
     opts = opts,
+    integrator = integrator,
   }
   _state.global = {
     laststatus = vim.o.laststatus,
@@ -40,7 +44,6 @@ local restore = function()
   end
 end
 
----@type Chowcho.UI.ShowFn
 M.show = function(self, idx, win)
   vim.o.laststatus = 2
   vim.o.cmdheight = 1
@@ -58,13 +61,11 @@ M.show = function(self, idx, win)
   return { win = win, label = label }
 end
 
----@type Chowcho.UI.HideFn
 M.hide = function(_)
   restore()
   clear()
 end
 
----@type Chowcho.UI.HighlightFn
 M.highlight = function(self)
   local colors = self.opts.selector.statusline.color
   local hl_groups = {
@@ -92,6 +93,13 @@ M.highlight = function(self)
       bg = bg,
     })
   end
+end
+
+M.pre_proc = function(self)
+  self.integrator:pre_proc()
+end
+M.post_proc = function(self)
+  self.integrator:post_proc()
 end
 
 return M
