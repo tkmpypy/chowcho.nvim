@@ -1,12 +1,9 @@
 local ui = require("chowcho.ui")
 
----@class Chowcho.Selector.Float
----@field opts Chowcho.Config.Root
+---@class Chowcho.Selector
 local M = {}
 local _float_wins = {}
 
----@param opts Chowcho.Config.Root
----@return Chowcho.UI.Selector
 M.new = function(opts)
   local obj = {
     opts = opts,
@@ -38,7 +35,6 @@ local is_enable_icon = function(opts)
   return false
 end
 
----@type Chowcho.UI.ShowFn
 M.show = function(self, idx, win)
   local pos = calc_center_win_pos(win)
   local current_win = vim.api.nvim_get_current_win()
@@ -88,7 +84,6 @@ M.show = function(self, idx, win)
   return win_label
 end
 
----@type Chowcho.UI.HideFn
 M.hide = function(_)
   for i, v in ipairs(_float_wins) do
     if v ~= nil then
@@ -98,20 +93,20 @@ M.hide = function(_)
   end
 end
 
----@type Chowcho.UI.HighlightFn
 M.highlight = function(self)
   local colors = self.opts.selector.float.color
   local hl_groups = {
     { name = "ChowchoActiveFloatBorder", default = "Special", color = colors.border.active },
-    { name = "ChowchoActiveFloatText", default = "FloatTitle", color = colors.text.active },
+    { name = "ChowchoActiveFloatText", default = "Title", color = colors.text.active },
     { name = "ChowchoActiveFloatTitle", default = "Normal", color = colors.label.active },
     { name = "ChowchoFloatBorder", default = "FloatBorder", color = colors.border.inactive },
     { name = "ChowchoFloatText", default = "Normal", color = colors.text.inactive },
-    { name = "ChowchoFloatTitle", default = "FloatTitle", color = colors.label.inactive },
+    { name = "ChowchoFloatTitle", default = "Title", color = colors.label.inactive },
   }
 
   for _, hl in pairs(hl_groups) do
     local default = vim.api.nvim_get_hl(0, { name = hl.default })
+    print(string.format("%s: %s", hl.default, default.fg))
     local c = string.format("#%06x", default.fg)
     if hl.color ~= nil then
       c = hl.color
@@ -121,5 +116,8 @@ M.highlight = function(self)
     })
   end
 end
+
+M.pre_proc = function(_) end
+M.post_proc = function(_) end
 
 return M

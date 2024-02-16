@@ -86,7 +86,9 @@ chowcho.run = function(fn, opt)
   ---@type Chowcho.UI.Window[]
   local _wins = {}
   local select_manager = selector.new(opt_local)
+  select_manager:pre_proc()
   select_manager:highlight()
+
   for i, v in ipairs(wins) do
     if not vim.api.nvim_win_is_valid(v) then
       goto continue
@@ -123,6 +125,8 @@ chowcho.run = function(fn, opt)
   end
 
   select_manager:hide()
+  select_manager:post_proc()
+
   vim.cmd.redraw()
 end
 

@@ -44,18 +44,40 @@
 ---@field label string
 ---@field win integer
 
----@alias Chowcho.UI.ShowFn fun(self, idx: integer, win: integer): Chowcho.UI.Window
----@alias Chowcho.UI.HideFn fun(self)
----@alias Chowcho.UI.HighlightFn fun(self)
+---@alias Chowcho.ShowFn fun(self, idx: integer, win: integer): Chowcho.UI.Window
+---@alias Chowcho.HideFn fun(self)
+---@alias Chowcho.HighlightFn fun(self)
+---@alias Chowcho.RegisterIntegrateFn fun(self, intg: Chowcho.Integrator)
+---@alias Chowcho.PreProcFn fun(self)
+---@alias Chowcho.PostProcFn fun(self)
 
----@class Chowcho.UI.Selector
+---@class Chowcho.Selector
 ---@field opts Chowcho.Config.Root
----@field public show Chowcho.UI.ShowFn
----@field public hide Chowcho.UI.HideFn
----@field public highlight Chowcho.UI.HighlightFn
+---@field integrator? Chowcho.IntegrateManager
+---@field public new fun(opts: Chowcho.Config.Root): Chowcho.Selector
+---@field public show Chowcho.ShowFn
+---@field public hide Chowcho.HideFn
+---@field public highlight Chowcho.HighlightFn
+---@field public pre_proc Chowcho.PreProcFn
+---@field public post_proc Chowcho.PostProcFn
 
----@class Chowcho.UI.SelectManager
----@field public selector? Chowcho.UI.Selector
----@field public show Chowcho.UI.ShowFn
----@field public hide Chowcho.UI.HideFn
----@field public highlight Chowcho.UI.HighlightFn
+---@class Chowcho.SelectManager
+---@field public selector? Chowcho.Selector
+---@field public new fun(opts: Chowcho.Config.Root): Chowcho.SelectManager
+---@field public show Chowcho.ShowFn
+---@field public hide Chowcho.HideFn
+---@field public highlight Chowcho.HighlightFn
+---@field public pre_proc Chowcho.PreProcFn
+---@field public post_proc Chowcho.PostProcFn
+
+---@class Chowcho.Integrator
+---@field public new fun(): Chowcho.Integrator
+---@field public pre_proc Chowcho.PreProcFn
+---@field public post_proc Chowcho.PostProcFn
+
+---@class Chowcho.IntegrateManager
+---@field public integrators Chowcho.Integrator[]
+---@field public new fun(): Chowcho.IntegrateManager
+---@field public register Chowcho.RegisterIntegrateFn
+---@field public pre_proc Chowcho.PreProcFn
+---@field public post_proc Chowcho.PostProcFn
