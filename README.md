@@ -5,10 +5,15 @@
 
 ## Installation
 
-- packer.nvim
+- `lazy.nvim`
 
 ```lua
-use {'tkmpypy/chowcho.nvim'}
+{
+  "tkmpypy/chowcho.nvim",
+  config = function()
+    require("chowcho").setup({...})
+  end,
+},
 ```
 
 ## Usage
