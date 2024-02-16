@@ -7,7 +7,7 @@ M.new = function()
   return obj
 end
 
-M.pre_proc = function(self)
+M.pre_proc = function(_)
   local ok, winsep = pcall(require, "colorful-winsep")
   if not ok then
     return
@@ -15,7 +15,7 @@ M.pre_proc = function(self)
 
   winsep.NvimSeparatorDel()
 end
-M.post_proc = function(self)
+M.post_proc = function(_)
   local ok, winsep = pcall(require, "colorful-winsep")
   if not ok then
     return
