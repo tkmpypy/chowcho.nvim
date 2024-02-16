@@ -106,7 +106,6 @@ M.highlight = function(self)
 
   for _, hl in pairs(hl_groups) do
     local default = vim.api.nvim_get_hl(0, { name = hl.default })
-    print(string.format("%s: %s", hl.default, default.fg))
     local c = string.format("#%06x", default.fg)
     if hl.color ~= nil then
       c = hl.color
