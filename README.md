@@ -38,9 +38,10 @@ call `setup` function
 ```lua
 require('chowcho').setup {
   -- Must be a single character. The length of the array is the maximum number of windows that can be moved.
-  labels = { "a", "b", "c", "d", "e", "f", "g", "h", "i" },
+  labels = { "A", "B", "C", "D", "E", "F", "G", "H", "I" },
   selector = "statusline", -- `float` or `statusline` (default: `float`)
   use_exclude_default = true,
+  ignore_case = true,
   exclude = function(buf, win)
     -- exclude noice.nvim's cmdline_popup
     local bt = vim.api.nvim_get_option_value("buftype", { buf = buf })

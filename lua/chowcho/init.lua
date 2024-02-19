@@ -39,6 +39,7 @@ local _default_opts = {
     },
   },
   labels = { "1", "2", "3", "4", "5", "6", "7", "8", "9" },
+  ignore_case = false,
   selector_style = "float",
   use_exclude_default = true,
   exclude = nil,
@@ -63,6 +64,18 @@ local filter_wins = function(wins)
   end
 
   return ret
+end
+
+---@param a string
+---@param b string
+---@param ignore_case boolean
+local is_match = function(a, b, ignore_case)
+  if ignore_case then
+    a = string.upper(a)
+    b = string.upper(b)
+  end
+
+  return a == b
 end
 
 ---@type Chowcho.RunFn
@@ -116,7 +129,7 @@ chowcho.run = function(fn, opt)
     if val ~= nil then
       for _, v in ipairs(_wins) do
         if v ~= nil then
-          if v.label == val then
+          if is_match(v.label, val, opt_local.ignore_case) then
             (fn or vim.api.nvim_set_current_win)(v.win)
           end
         end
