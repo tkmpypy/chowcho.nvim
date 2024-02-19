@@ -33,6 +33,7 @@
 ---@field public selector Chowcho.Config.UI
 ---@field public labels string[] @Must be a single character. The length of the array is the maximum number of windows that can be moved.
 ---@field public selector_style Chowcho.SelectorType
+---@field public ignore_case boolean @Ignore case of input character
 
 ---@alias Chowcho.RunFn fun(fn?:fun(win:integer), opts?:Chowcho.Config.Root)
 
