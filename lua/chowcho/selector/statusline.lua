@@ -1,5 +1,4 @@
 local integ = require("chowcho.integrator")
-local winsep = require("chowcho.integrator.colorful-winsep")
 
 ---@type Chowcho.Selector
 local M = {}
@@ -10,7 +9,6 @@ local _state = {
 
 M.new = function(opts)
   local integrator = integ.new()
-  integrator:register(winsep.new())
 
   local obj = {
     opts = opts,
