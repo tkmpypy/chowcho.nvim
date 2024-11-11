@@ -96,22 +96,29 @@ end
 M.highlight = function(self)
   local colors = self.opts.selector.float.color
   local hl_groups = {
-    { name = "ChowchoActiveFloatBorder", default = "Special", color = colors.border.active },
-    { name = "ChowchoActiveFloatText", default = "Title", color = colors.text.active },
-    { name = "ChowchoActiveFloatTitle", default = "Normal", color = colors.label.active },
-    { name = "ChowchoFloatBorder", default = "FloatBorder", color = colors.border.inactive },
-    { name = "ChowchoFloatText", default = "Normal", color = colors.text.inactive },
-    { name = "ChowchoFloatTitle", default = "Title", color = colors.label.inactive },
+    { name = "ChowchoActiveFloatBorder", default = "Special", color = colors.border.active, fallback = "#b400c8" },
+    { name = "ChowchoActiveFloatText", default = "Title", color = colors.text.active, fallback = "#fefefe" },
+    { name = "ChowchoActiveFloatTitle", default = "Normal", color = colors.label.active, fallback = "c8cfff" },
+    { name = "ChowchoFloatBorder", default = "FloatBorder", color = colors.border.inactive, fallback = "#fefefe" },
+    { name = "ChowchoFloatText", default = "Normal", color = colors.text.inactive, fallback = "#d0d0d0" },
+    { name = "ChowchoFloatTitle", default = "Title", color = colors.label.inactive, fallback = "#ababab" },
   }
 
   for _, hl in pairs(hl_groups) do
-    local default = vim.api.nvim_get_hl(0, { name = hl.default })
-    local c = string.format("#%06x", default.fg)
+    local color = nil
     if hl.color ~= nil then
-      c = hl.color
+      color = hl.color
+    else
+      local default = vim.api.nvim_get_hl(0, { name = hl.default })
+      if default.fg == nil then
+        color = hl.fallback
+      else
+        color = string.format("#%06x", default.fg)
+      end
     end
+
     vim.api.nvim_set_hl(0, hl.name, {
-      fg = c,
+      fg = color,
     })
   end
 end
